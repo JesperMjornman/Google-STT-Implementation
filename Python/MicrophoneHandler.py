@@ -53,12 +53,14 @@ class MicrophoneHandler:
 
     def __active_recording(self, filename=None):
         print('Recording: {}'.format(filename))
-        stream = self.paudio.open(format=self.FORMAT,
-                                  channels=self.CHANNELS,
-                                  rate = self.RATE,
-                                  input=True,
-                                  input_device_index=0,
-                                  frames_per_buffer=self.CHUNK)
+        stream = self.paudio.open(
+            format             = self.FORMAT,
+            channels           = self.CHANNELS,
+            rate               = self.RATE,
+            input              = True,
+            input_device_index = 0,
+            frames_per_buffer  = self.CHUNK
+        )
        
         self.recording = True       
         frames = []
