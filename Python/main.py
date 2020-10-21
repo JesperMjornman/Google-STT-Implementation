@@ -1,7 +1,10 @@
 import SpeechRecognition
 import time
-recognizer = SpeechRecognition.SpeechRecognition(save_audio_files=True)
+import os
 
-recognizer.start_record_microphone()
-time.sleep(5)
-recognizer.stop_record_microphone()
+recognizer = SpeechRecognition.SpeechRecognition(API_KEY_LOCATION=os.path.join('C:', 'Users', '46709', 'Downloads', 'GAPI.json'), save_audio_files=True)
+
+#recognizer.start_record_microphone()
+#time.sleep(5)
+#recognizer.stop_record_microphone()
+print(recognizer.recognize_sync_audio_file(file='./audio/' + '2020-10-21_17-38-31.raw', return_all_options=False))# + recognizer.current_session[0] + '.raw'))
