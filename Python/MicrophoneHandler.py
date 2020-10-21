@@ -14,16 +14,17 @@ class MicrophoneHandler:
     All audio will be recorded in MONO, if need be change the CHANNELS to any number to use.
     """
     def __init__(self, audio_folder):
-        self.CHUNK = 1024
-        self.FORMAT = pyaudio.paInt16  
-        self.RATE = 44100
-        self.CHANNELS = 1
+        self.CHUNK     = 1024
+        self.FORMAT    = pyaudio.paInt16  
+        self.RATE      = 44100
+        self.CHANNELS  = 1
         self.EXTENSION = '.raw'
 
-        self.recording = False
+        self.recording       = False
         self.current_session = None
-        self.audio_folder = audio_folder
-        self.paudio = pyaudio.PyAudio()
+        self.audio_folder    = audio_folder
+        self.paudio          = pyaudio.PyAudio()
+        
         self.__active_thread = None
         
     def start_recording(self, filename = None):
