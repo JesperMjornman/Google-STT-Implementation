@@ -20,10 +20,9 @@ class SpeechRecognition:
     def __init__(self, API_KEY_LOCATION, preffered_audio_folder = None, save_audio_files = False):
         # Set environment variable.
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_KEY_LOCATION
-
+        
         self.current_session = []
         self.save_audio_file = save_audio_files
-        self.f_extension = '.raw'
         self.client = speech.SpeechClient()
 
         if (preffered_audio_folder == None):
