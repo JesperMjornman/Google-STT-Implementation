@@ -1,6 +1,6 @@
 import SpeechRecognition
 import time
-recognizer = SpeechRecognition.SpeechRecognition()
+recognizer = SpeechRecognition.SpeechRecognition(save_audio_files=True)
 
 recognizer.start_record_microphone()
 time.sleep(5)

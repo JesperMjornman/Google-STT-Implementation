@@ -14,9 +14,9 @@ class SpeechRecognition:
 
     The microphone recording is handled in its own thread by using the MicrophoneHandler.
     """
-    def __init__(self, preffered_audio_folder = None):
+    def __init__(self, preffered_audio_folder = None, save_audio_files = False):
         self.current_session = []
-        self.save_audio_file = False
+        self.save_audio_file = save_audio_files
         self.f_extension = '.raw'
 
         if (preffered_audio_folder == None):

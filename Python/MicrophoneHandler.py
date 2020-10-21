@@ -3,7 +3,7 @@ import wave
 import datetime
 import time
 import os
-import _thread
+from threading import Thread
 
 class MicrophoneHandler:
     """
@@ -24,49 +24,59 @@ class MicrophoneHandler:
         self.current_session = None
         self.audio_folder = audio_folder
         self.paudio = pyaudio.PyAudio()
+        self.__active_thread = None
         
     def start_recording(self, filename = None):
         """
         Starts recording the default microphone.
         Should be created as a separate thread to allow it to record for as long as needed.
         """
+        if (self.paudio.get_device_count() < 1):
+            print('Failed to identify any microphone!')
+            return
+
         if (filename == None):
-            filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%D_%H-%M-%S')
+            filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         self.current_session = filename
-        _thread.start_new_thread(self.__active_recording, (self, filename, ))
+        self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
+        self.__active_thread.start()
         
             
 
     def stop_recording(self):
         print('Stopping recording.')
         self.recording = False
+        self.__active_thread.join() 
 
     def __active_recording(self, filename=None):
-        print('Recording: {filename}')
+        print('Recording: {}'.format(filename))
         stream = self.paudio.open(format=self.FORMAT,
                                   channels=self.CHANNELS,
                                   rate = self.RATE,
+                                  input=True,
+                                  input_device_index=0,
                                   frames_per_buffer=self.CHUNK)
+       
         self.recording = True       
         frames = []
         try:
-            while(self.recording):
+            while(self.recording is True):
                 data = stream.read(self.CHUNK)
                 frames.append(data)
         except:
             print('Error when recording audio.')
-            
+
         stream.stop_stream()
         stream.close()
         self.paudio.terminate()
-        
-        try:
-            file = wave.open(os.path.join(audio_folder, filename, self.EXTENSION), 'wb')
-            file.setnchannels = self.CHANNELS
+
+        try:          
+            file = wave.open(os.path.join(self.audio_folder, filename) + self.EXTENSION, 'wb')
+            file.setnchannels(self.CHANNELS)
             file.setsampwidth(self.paudio.get_sample_size(self.FORMAT))
             file.setframerate(self.RATE)
             file.writeframesraw(b''.join(frames))
             file.close()
         except:
-            print('Failure to write file {filename}{self.EXTENSION}')
+            print('Failure to write file {}{}'.format(filename, self.EXTENSION))
