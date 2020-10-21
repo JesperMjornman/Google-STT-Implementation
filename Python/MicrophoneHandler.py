@@ -30,7 +30,8 @@ class MicrophoneHandler:
     def start_recording(self, filename = None):
         """
         Starts recording the default microphone.
-        Should be created as a separate thread to allow it to record for as long as needed.
+        Creates a new thread for recording audio.
+        Currently only supports one thread, any more may cause issues.
         """
         if (self.paudio.get_device_count() < 1):
             print('Failed to identify any microphone!')
