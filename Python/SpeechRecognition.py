@@ -69,7 +69,7 @@ class SpeechRecognition:
 
         response = self.client.recognize(config=config, audio=audio)
         
-        if( len(response.results) == 0 ):
+        if (len(response.results) == 0):
             return 'Failed to find any transcripts.'
         elif not return_all_options: 
             return response.results[0].alternatives[0].transcript
