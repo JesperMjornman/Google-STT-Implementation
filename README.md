@@ -8,4 +8,4 @@ Note that each implementation require a API - key from Google.
 
 TODO:
 
-[ ] - Add Asycnronous reognition for larger files.
+[] Add Asycnronous reognition for larger files.
