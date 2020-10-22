@@ -14,8 +14,15 @@ class SpeechRecognition:
 
     Files will be saved in the preffered_audio_folder or in the default ./audio folder.
     If save_audio_files is False all recorded audio will be deleted on destruction of this object.
-
     The microphone recording is handled in its own thread by using the MicrophoneHandler.
+   
+    ---
+
+    API_KEY_LOCATION -- path to the API KEY json file
+
+    preffered_audio_folder -- preffered folder for recorded audio files (defaults to ./audio)
+
+    save_audio_files -- save audio files after program is finished if True else remove all recorded files.
     """
     def __init__(self, API_KEY_LOCATION, preffered_audio_folder = None, save_audio_files = False):
         # Set environment variable.
@@ -46,16 +53,19 @@ class SpeechRecognition:
 
     def stop_record_microphone(self):
         """
-        Stop recording.
+        Stop recording, saves audio file.
+
+        Returns the filename of the audio file.
         """
-        self.microphone_handler.stop_recording()
+        return self.microphone_handler.stop_recording()
                   
     def recognize_sync_audio_file(self, file, return_all_options = False):
         """
         Send audio to Google API for Speech To Text and
         return the string representation of the audio.
         
-        file is the filepath to file for STT      
+        file -- the filepath to file for STT     
+        return_all_options -- option to return .json array of found alternatives or the only the most likely. 
         """
         with io.open(file, "rb") as audio_file:
             content = audio_file.read()
