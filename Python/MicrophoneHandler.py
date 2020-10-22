@@ -8,10 +8,11 @@ from threading import Thread
 class MicrophoneHandler:
     """
     Represents a microphone handler for recording and saving audio recorded.
-    Uses PyAudio to record audio and stores the recorded files in which will be saved
-    in the format specified by the caller or a defaults to a timestamp. 
-    All files will be saved in the specified "audio_folder".
-    All audio will be recorded in MONO, if need be change the CHANNELS to any number to use.
+    Uses PyAudio to record audio and stores the recorded files which will be saved
+    and named in the format specified by the caller. 
+    If no specification is made it will default to a timestamp. 
+    
+    All files will be saved in the specified "audio_folder".   
     """
     def __init__(self, audio_folder):
         self.CHUNK     = 1024
