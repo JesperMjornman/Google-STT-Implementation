@@ -41,6 +41,15 @@ class SpeechRecognition:
 
         self.microphone_handler = MicrophoneHandler.MicrophoneHandler(self.audio_file_folder)
 
+        # If any language isn't here add it to enable support for it (the recognizer will check if the language is present here)
+        # See all supported languages on: https://cloud.google.com/speech-to-text/docs/languages
+        self.languages = [
+            'ca-ES', 'my-MM', 'hr-HR',
+            'da-DK', 'nl-BE', 'en-US',
+            'fi-FI', 'fr-FR', 'de-AT',
+            'de-DE', 'sv-SE', 'no-NO'          
+        ]
+
     def start_record_microphone(self):
         """
         Start recording from microphone.
@@ -61,7 +70,7 @@ class SpeechRecognition:
         """
         return self.microphone_handler.stop_recording()
                   
-    def recognize_sync_audio_file(self, file, return_dict_object = False, is_long_recording = False, return_all_options = False):
+    def recognize_sync_audio_file(self, file, language_code = "en-US", return_dict_object = False, is_long_recording = False, return_all_options = False):
         """
         Send audio through Google API for Speech To Text and
         return the string representation of the audio.
@@ -69,7 +78,8 @@ class SpeechRecognition:
         If return_all_options is set it will return a str object of the results message.
         
         Args:
-            file -- the filepath to file for STT     
+            file -- the filepath to file for STT 
+            language_code -- language to use for recognition. See languages for supported languages.    
             return_all_options -- option to return .json array of found alternatives or the only the most likely. 
             return_dict_object -- return the full dictionary object of the most probable alternative.
         """
@@ -77,6 +87,9 @@ class SpeechRecognition:
             content = audio_file.read()
             audio = speech.RecognitionAudio(content=content)
 
+        if language_code not in self.languages:
+            return('{} is not a supported language. Try adding the code to the languages list.'.format(language_code))
+            
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=self.microphone_handler.RATE,
