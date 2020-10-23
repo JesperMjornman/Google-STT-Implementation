@@ -82,14 +82,18 @@ class SpeechRecognition:
             language_code -- language to use for recognition. See languages for supported languages.    
             return_all_options -- option to return .json array of found alternatives or the only the most likely. 
             return_dict_object -- return the full dictionary object of the most probable alternative.
+        
+        Returns:
+            String of the speech recognition result. If any error occurs returns -1
         """
         with io.open(file, "rb") as audio_file:
             content = audio_file.read()
             audio = speech.RecognitionAudio(content=content)
 
         if language_code not in self.languages:
-            return('{} is not a supported language. Try adding the code to the languages list.'.format(language_code))
-            
+            print('{} is not a supported language. Try adding the code to the languages list.'.format(language_code))
+            return -1
+
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=self.microphone_handler.RATE,
@@ -105,7 +109,7 @@ class SpeechRecognition:
             else:
                 return str(response)
         except:
-            return ''
+            return -1
     
     def __clear_audio_files(self):
         """
