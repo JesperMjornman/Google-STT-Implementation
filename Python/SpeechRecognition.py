@@ -5,6 +5,7 @@ import os
 import io
 
 from google.cloud import speech
+from google.protobuf.json_format import MessageToDict, MessageToJson
 
 class SpeechRecognition:
     """
@@ -31,6 +32,7 @@ class SpeechRecognition:
         self.current_session = []
         self.save_audio_file = save_audio_files
         self.client = speech.SpeechClient()
+        self.record_length = 0
 
         if (preffered_audio_folder == None):
             self.audio_file_folder = './audio'
@@ -59,13 +61,17 @@ class SpeechRecognition:
         """
         return self.microphone_handler.stop_recording()
                   
-    def recognize_sync_audio_file(self, file, return_all_options = False):
+    def recognize_sync_audio_file(self, file, return_dict_object = False, is_long_recording = False, return_all_options = False):
         """
-        Send audio to Google API for Speech To Text and
+        Send audio through Google API for Speech To Text and
         return the string representation of the audio.
         
-        file -- the filepath to file for STT     
-        return_all_options -- option to return .json array of found alternatives or the only the most likely. 
+        If return_all_options is set it will return a str object of the results message.
+        
+        Args:
+            file -- the filepath to file for STT     
+            return_all_options -- option to return .json array of found alternatives or the only the most likely. 
+            return_dict_object -- return the full dictionary object of the most probable alternative.
         """
         with io.open(file, "rb") as audio_file:
             content = audio_file.read()
@@ -77,18 +83,20 @@ class SpeechRecognition:
             language_code="en-US",
         )
 
-        response = self.client.recognize(config=config, audio=audio)
-        
-        if (len(response.results) == 0):
-            return 'Failed to find any transcripts.'
-        elif not return_all_options: 
-            return response.results[0].alternatives[0].transcript
-        else:
-            return response.results
+        try:
+            response = self.client.long_running_recognize(config=config, audio=audio, timeout=500).result()   
+            if return_dict_object:
+                return self.__get_message_from_proto(response) 
+            elif not return_all_options: 
+                return self.__get_message_from_proto(response)['transcript']
+            else:
+                return str(response)
+        except:
+            return ''
     
     def __clear_audio_files(self):
         """
-        Clear all audio files from specified audio folder.
+        Clear all audio files from set audio folder.
         """
         try:
             shutil.rmtree(self.audio_file_folder)
@@ -102,3 +110,24 @@ class SpeechRecognition:
         """      
         if not self.save_audio_file:
             self.__clear_audio_files()
+
+    def __get_message_from_proto(self, message) -> dict: 
+        """
+        Return the most confident transcript from google.protobuf
+
+        Args:
+            message -- the protobuf message received when translating.
+        """     
+        result = { 'transcript' : '' , 'confidence' : 0.0 }
+        try:
+            alt = str(message).split('alternatives {')[1].split('}')[0]     
+            
+            if (alt.find('transcript:') != -1):
+                alt = alt.split('\"')
+                result['transcript'] = alt[1]
+                result['confidence'] = alt[2].split(':')[1]
+        except:
+            result['transcript'] = ''
+            result['confidence'] = 0.0
+
+        return result

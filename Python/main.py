@@ -2,7 +2,7 @@ import SpeechRecognition
 import time
 import os
 
-recognizer = SpeechRecognition.SpeechRecognition(API_KEY_LOCATION=os.path.join('C:', 'Users', '46709', 'Downloads', 'GAPI.json'), save_audio_files=True)
+recognizer = SpeechRecognition.SpeechRecognition(API_KEY_LOCATION=os.path.join('../_key', 'GAPI.json'), save_audio_files=False)
 
 #recognizer.start_record_microphone()
 #time.sleep(5)

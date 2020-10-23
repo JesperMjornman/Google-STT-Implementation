@@ -34,7 +34,8 @@ class MicrophoneHandler:
         Creates a new thread for recording audio.
         Currently only supports one thread, any more may cause issues.
 
-        filename -- filename of current recording, if None it will default to a timestamp.
+        Args:
+            filename -- filename of current recording, if None it will default to a timestamp.
         """
         if (self.paudio.get_device_count() < 1):
             print('Failed to identify any microphone!')
@@ -44,20 +45,27 @@ class MicrophoneHandler:
             filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         self.current_session = filename
+        if (self.__active_thread != None):
+            self.stop_recording
+        
         self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
         self.__active_thread.start()
         
     def stop_recording(self):
         """
-        Stops recording, waits for thread to finish.
+        Stops recording and waits for thread to finish.
         Returns the filename of the new audio file.
         """
         print('Stopping recording.')
         self.recording = False
         self.__active_thread.join()
+        self.__active_thread = None
         return self.current_session
 
     def __active_recording(self, filename=None):
+        """
+        Record function for the active recorder thread.
+        """
         print('Recording: {}'.format(filename))
         stream = self.paudio.open(
             format             = self.FORMAT,
