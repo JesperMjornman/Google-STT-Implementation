@@ -17,13 +17,10 @@ class SpeechRecognition:
     If save_audio_files is False all recorded audio will be deleted on destruction of this object.
     The microphone recording is handled in its own thread by using the MicrophoneHandler.
    
-    ---
-
-    API_KEY_LOCATION -- path to the API KEY json file
-
-    preffered_audio_folder -- preffered folder for recorded audio files (defaults to ./audio)
-
-    save_audio_files -- save audio files after program is finished if True else remove all recorded files.
+    Args:   
+        API_KEY_LOCATION -- path to the API KEY json file
+        preffered_audio_folder -- preffered folder for recorded audio files (defaults to ./audio)
+        save_audio_files -- save audio files after program is finished if True else remove all recorded files.
     """
     def __init__(self, API_KEY_LOCATION, preffered_audio_folder = None, save_audio_files = False):
         # Set environment variable.
@@ -66,7 +63,8 @@ class SpeechRecognition:
         """
         Stop recording, saves audio file.
 
-        Returns the filename of the audio file.
+        Returns: 
+            the filename of the audio file.
         """
         return self.microphone_handler.stop_recording()
                   
@@ -120,20 +118,15 @@ class SpeechRecognition:
         except:
             print('Failure to clear audio files in {self.audio_file_folder}')
 
-    def __del__(self):
-        """
-        Deconstructor.
-        Remove all audio files if save_audio_file is False
-        """      
-        if not self.save_audio_file:
-            self.__clear_audio_files()
-
     def __get_message_from_proto(self, message) -> dict: 
         """
         Return the most confident transcript from google.protobuf
 
         Args:
             message -- the protobuf message received when translating.
+        
+        Returns:
+            Dictionary containing transcript and confidence.
         """     
         result = { 'transcript' : '' , 'confidence' : 0.0 }
         try:
@@ -148,3 +141,12 @@ class SpeechRecognition:
             result['confidence'] = 0.0
 
         return result
+
+    def __del__(self):
+        """
+        Deconstructor.
+        Remove all audio files if save_audio_file is False
+        """      
+        if not self.save_audio_file:
+            self.__clear_audio_files()
+
