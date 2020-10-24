@@ -68,7 +68,7 @@ class SpeechRecognition:
         """
         return self.microphone_handler.stop_recording()
                   
-    def recognize_sync_audio_file(self, file, language_code = "en-US", return_dict_object = False, is_long_recording = False, return_all_options = False):
+    def recognize_sync_audio_file(self, file, language_code = "en-US", is_long_recording = False, return_options = None):
         """
         Send audio through Google API for Speech To Text and
         return the string representation of the audio.
@@ -77,9 +77,11 @@ class SpeechRecognition:
         
         Args:
             file -- the filepath to file for STT 
-            language_code -- language to use for recognition. See languages for supported languages.    
-            return_all_options -- option to return .json array of found alternatives or the only the most likely. 
-            return_dict_object -- return the full dictionary object of the most probable alternative.
+            language_code -- language to use for recognition. See languages for supported languages.   
+            return_options -- options for object to be returned:
+                                - "all"  = return the str object of the protobuf message.
+                                - "dict" = return dictionary with transcription and confidence of the best choice.
+                                - "None" = return the transcription of the most probable result. 
         
         Returns:
             String of the speech recognition result. If any error occurs returns -1
@@ -89,23 +91,23 @@ class SpeechRecognition:
             audio = speech.RecognitionAudio(content=content)
 
         if language_code not in self.languages:
-            print('{} is not a supported language. Try adding the code to the languages list.'.format(language_code))
+            print('\"{}\" is not a supported language. Try adding the code to the languages list.\n'.format(language_code))
             return -1
 
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=self.microphone_handler.RATE,
-            language_code="en-US",
+            language_code=language_code,
         )
 
         try:
             response = self.client.long_running_recognize(config=config, audio=audio, timeout=500).result()   
-            if return_dict_object:
+            if return_options == "dict":
                 return self.__get_message_from_proto(response) 
-            elif not return_all_options: 
-                return self.__get_message_from_proto(response)['transcript']
-            else:
+            elif return_options == "all":
                 return str(response)
+            else:
+                return self.__get_message_from_proto(response)['transcript']
         except:
             return -1
     
