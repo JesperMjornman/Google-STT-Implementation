@@ -149,6 +149,8 @@ class SpeechRecognition:
         Deconstructor.
         Remove all audio files if save_audio_file is False
         """      
+        self.stop_record_microphone()
+        
         if not self.save_audio_file:
             self.__clear_audio_files()
 

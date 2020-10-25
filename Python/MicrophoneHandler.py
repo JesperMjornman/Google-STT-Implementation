@@ -58,7 +58,8 @@ class MicrophoneHandler:
         """
         print('Stopping recording.')
         self.recording = False
-        self.__active_thread.join()
+        if self.__active_thread != None:
+            self.__active_thread.join()
         self.__active_thread = None
         return self.current_session
 
