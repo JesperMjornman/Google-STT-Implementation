@@ -11,8 +11,9 @@ class MicrophoneHandler:
     Uses PyAudio to record audio and stores the recorded files which will be saved
     and named in the format specified by the caller. 
     If no specification is made it will default to a timestamp. 
-    
-    All files will be saved in the specified "audio_folder".   
+
+    Args:
+        audio_folder -- folder to store recorded audio in.  
     """
     def __init__(self, audio_folder):
         self.CHUNK     = 1024
@@ -53,14 +54,17 @@ class MicrophoneHandler:
         
     def stop_recording(self):
         """
-        Stops recording and waits for thread to finish.
+        Stops recording and waits for the recorder thread to finish.
         Returns the filename of the new audio file.
         """
         print('Stopping recording.')
-        self.recording = False
+        self.recording = False        
+       
         if self.__active_thread != None:
             self.__active_thread.join()
-        self.__active_thread = None
+        
+        self.__active_thread = None   
+
         return self.current_session
 
     def __active_recording(self, filename=None):

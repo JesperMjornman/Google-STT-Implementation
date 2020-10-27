@@ -1,5 +1,4 @@
 import MicrophoneHandler
-import _thread
 import shutil
 import os
 import io
@@ -76,22 +75,22 @@ class SpeechRecognition:
         If return_all_options is set it will return a str object of the results message.
         
         Args:
-            file -- the filepath to file for STT 
-            language_code -- language to use for recognition. See languages for supported languages.   
+            file -- the filepath to file for STT. 
+            language_code  -- language to use for recognition. See languages for supported languages.   
             return_options -- options for object to be returned:
-                                - "all"  = return the str object of the protobuf message.
-                                - "dict" = return dictionary with transcription and confidence of the best choice.
-                                - "None" = return the transcription of the most probable result. 
+                              * "all"  = return the str object of the protobuf message.
+                              * "dict" = return dictionary with transcription and confidence of the best choice.
+                              *  None  = return the transcription of the most probable result. 
         
         Returns:
-            String of the speech recognition result. If any error occurs returns -1
+            String or Dictionary of the speech recognition result. If any error occurs returns -1.
         """
         with io.open(file, "rb") as audio_file:
             content = audio_file.read()
             audio = speech.RecognitionAudio(content=content)
 
         if language_code not in self.languages:
-            print('\"{}\" is not a supported language. Try adding the code to the languages list.\n'.format(language_code))
+            print('\"{}\" is not a supported language code. Make sure it\'s supported by Google and try adding adding it to the languages list.\n'.format(language_code))
             return -1
 
         config = speech.RecognitionConfig(
@@ -122,7 +121,7 @@ class SpeechRecognition:
 
     def __get_message_from_proto(self, message) -> dict: 
         """
-        Return the most confident transcript from google.protobuf
+        Decode and get the most confident message from the protobuf.
 
         Args:
             message -- the protobuf message received when translating.
@@ -147,7 +146,7 @@ class SpeechRecognition:
     def __del__(self):
         """
         Deconstructor.
-        Remove all audio files if save_audio_file is False
+        Stop recording and remove all audio files if save_audio_file is False
         """      
         self.stop_record_microphone()
         
