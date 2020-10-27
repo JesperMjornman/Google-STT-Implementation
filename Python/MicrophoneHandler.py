@@ -12,6 +12,9 @@ class MicrophoneHandler:
     and named in the format specified by the caller. 
     If no specification is made it will default to a timestamp. 
 
+    As the recording starts a new thread the created object should not go out of scope
+    unless intended to do so.
+     
     Args:
         audio_folder -- folder to store recorded audio in.  
     """
@@ -103,5 +106,7 @@ class MicrophoneHandler:
             file.close()
         except:
             print('Failure to write file {}{}'.format(filename, self.EXTENSION))
+            if not file.closed:
+                file.close()
     
     #def __active_streaming(self, filename=None):
