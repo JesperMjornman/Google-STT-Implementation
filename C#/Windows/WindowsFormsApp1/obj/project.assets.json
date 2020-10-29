@@ -892,11 +892,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\WindowsFormsApp1\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
+      "projectUniqueName": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\Google_Speech_Recognition\\C#\\Windows\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
       "projectName": "WindowsFormsApp1",
-      "projectPath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\WindowsFormsApp1\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
+      "projectPath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\Google_Speech_Recognition\\C#\\Windows\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
       "packagesPath": "C:\\Users\\46709\\.nuget\\packages\\",
-      "outputPath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\WindowsFormsApp1\\WindowsFormsApp1\\obj\\",
+      "outputPath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\Google_Speech_Recognition\\C#\\Windows\\WindowsFormsApp1\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "E:\\Microsoft\\Xamarin\\NuGet\\",

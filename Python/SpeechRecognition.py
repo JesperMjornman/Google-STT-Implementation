@@ -2,7 +2,9 @@ import MicrophoneHandler
 import shutil
 import os
 import io
+import queue
 
+import grpc
 from google.cloud import speech
 from google.protobuf.json_format import MessageToDict, MessageToJson
 
@@ -101,15 +103,68 @@ class SpeechRecognition:
 
         try:
             response = self.client.long_running_recognize(config=config, audio=audio, timeout=500).result()   
-            if return_options == "dict":
-                return self.__get_message_from_proto(response) 
-            elif return_options == "all":
-                return str(response)
-            else:
-                return self.__get_message_from_proto(response)['transcript']
         except:
             return -1
+
+        if return_options == "dict":
+            return self.__get_message_from_proto(response) 
+        elif return_options == "all":
+            return str(response)
+        else:
+            return self.__get_message_from_proto(response)['transcript']
+
     
+    
+    # pylint: disable=too-many-function-args
+    def recognize_async_audio_stream(self, language_code = "en-US"):
+        """
+        Recognize in "real-time" from microphone stream.
+
+        Args:
+            language_code -- language to use for recognition. See languages for supported languages.   
+        """      
+        config_stream = speech.StreamingRecognitionConfig(
+            config = speech.RecognitionConfig(
+                encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+                sample_rate_hertz=self.microphone_handler.RATE,
+                language_code=language_code,
+            ),
+            interim_results=True      
+        )
+        
+        data = []
+        self.microphone_handler.start_recording(streaming=True)
+        while self.microphone_handler.recording:
+            chunk = self.microphone_handler.chunk_buf.get()
+
+            if chunk is None:
+                return
+
+            data.append(chunk)
+            while True:
+                try:                   
+                    chunk = self.microphone_handler.chunk_buf.get(block=False) 
+                    
+                    if chunk is None:
+                        return
+
+                    data.append(chunk)
+                    
+                except queue.Empty:
+                    break
+
+            requests = (speech.StreamingRecognizeRequest(audio_content=content) for content in b''.join(data)) # Hittar inget att iterera?
+
+            try:
+                responses = self.client.streaming_recognize(config_stream, requests)
+                for response in responses:
+                    if response.results[0].is_final:
+                        print(response.results[0].alternatives[0].transcript)
+            except:
+                print('Failed to get response.')
+          
+            self.microphone_handler.recording = False #tt
+
     def __clear_audio_files(self):
         """
         Clear all audio files from set audio folder.

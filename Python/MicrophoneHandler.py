@@ -3,6 +3,7 @@ import wave
 import datetime
 import time
 import os
+import queue
 from threading import Thread
 
 class MicrophoneHandler:
@@ -26,13 +27,15 @@ class MicrophoneHandler:
         self.EXTENSION = '.raw'
 
         self.recording       = False
+        self.streaming       = False
+        self.chunk_buf       = queue.Queue()
         self.current_session = None
         self.audio_folder    = audio_folder
         self.paudio          = pyaudio.PyAudio()
         
         self.__active_thread = None
-        
-    def start_recording(self, filename = None):
+       
+    def start_recording(self, filename = None, streaming = False):
         """
         Starts recording the default microphone.
         Creates a new thread for recording audio.
@@ -45,14 +48,18 @@ class MicrophoneHandler:
             print('Failed to identify any microphone!')
             return
 
-        if (filename == None):
+        if filename is None:
             filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         self.current_session = filename
-        if (self.__active_thread != None):
+        if self.__active_thread is not None:
             self.stop_recording
-        
-        self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
+       
+        if streaming:
+            self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )
+        else:
+            self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
+       
         self.__active_thread.start()
         
     def stop_recording(self):
@@ -70,20 +77,32 @@ class MicrophoneHandler:
 
         return self.current_session
 
-    def __active_recording(self, filename=None):
+    def _audio_callback_handler(self, in_data, *args, **kwargs):
+        """ 
+        Collect and store data from Microphone 
+        """
+        self.chunk_buf.put(in_data)
+        return None, pyaudio.paContinue
+
+    def __active_recording(self, filename):
         """
         Record function for the active recorder thread.
         """
         print('Recording: {}'.format(filename))
-        stream = self.paudio.open(
-            format             = self.FORMAT,
-            channels           = self.CHANNELS,
-            rate               = self.RATE,
-            input              = True,
-            input_device_index = 0,
-            frames_per_buffer  = self.CHUNK
-        )
-       
+        try:
+            stream = self.paudio.open(
+                format             = self.FORMAT,
+                channels           = self.CHANNELS,
+                rate               = self.RATE,
+                input              = True,
+                input_device_index = 0,
+                frames_per_buffer  = self.CHUNK,
+                stream_callback    = self._audio_callback_handler,
+            )
+        except: 
+            print('Failed to open audio stream.')
+            return
+
         self.recording = True       
         frames = []
         try:
@@ -108,5 +127,30 @@ class MicrophoneHandler:
             print('Failure to write file {}{}'.format(filename, self.EXTENSION))
             if not file.closed:
                 file.close()
-    
-    #def __active_streaming(self, filename=None):
+
+    def __active_streaming(self, filename):
+        self.recording = True
+        print('Streaming: {}'.format(filename))
+        try:
+            stream = self.paudio.open(
+                format             = self.FORMAT,
+                channels           = self.CHANNELS,
+                rate               = self.RATE,
+                input              = True,
+                input_device_index = 0,
+                frames_per_buffer  = self.CHUNK,
+                stream_callback    = self._audio_callback_handler,
+            )
+        except: 
+            print('Failed to open audio stream.')
+            return
+
+        stream.start_stream()
+        time.sleep(5)
+        
+        stream.stop_stream()
+        stream.close()
+        self.paudio.terminate()
+
+        self.streaming = False
+        self.recording = False

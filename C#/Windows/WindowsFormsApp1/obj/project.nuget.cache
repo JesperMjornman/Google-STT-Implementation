@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5dtX6nrsbojPAAkV2yMJPfALpd1+3qbxZtNg6Z1kQmE8MOPFGazKo4oeTp2w2X5paKFDhb3Wr7EwZU3R/5+Yqw==",
+  "dgSpecHash": "jewg7q1oUbftyZy58HPD3J232sBvr+a0C7G2/7aOnSsG9YebRHXBvTmumcUXKoQRgAic0cSNQjDqqXoo5gqq0Q==",
   "success": true,
-  "projectFilePath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\WindowsFormsApp1\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
+  "projectFilePath": "E:\\Program Files (x86)\\Microsoft Visual Studio\\Projects\\Google_Speech_Recognition\\C#\\Windows\\WindowsFormsApp1\\WindowsFormsApp1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\46709\\.nuget\\packages\\google.api.commonprotos\\2.0.0\\google.api.commonprotos.2.0.0.nupkg.sha512",
     "C:\\Users\\46709\\.nuget\\packages\\google.api.gax\\3.0.0\\google.api.gax.3.0.0.nupkg.sha512",
