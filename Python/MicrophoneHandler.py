@@ -97,6 +97,9 @@ class MicrophoneHandler:
     def __active_recording(self, filename):
         """
         Record function for the active recorder thread.
+
+        Args:
+            filename -- name for the recorded audio file.
         """
         print('Recording: {}'.format(filename))
         try:
@@ -138,7 +141,13 @@ class MicrophoneHandler:
             if not file.closed:
                 file.close()
 
-    def __active_streaming(self, filename):
+    def __active_streaming(self, filename = None):
+        """
+        Streaming function for the active recorded thread.
+
+        Args:
+            filename -- OPTIONAL.
+        """
         self.recording = True
         print('Streaming: {}'.format(filename))
         try:
