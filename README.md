@@ -7,7 +7,11 @@ Each named folder contains different code implementations (such as C#, Python, .
 Note that each implementation require an API - key from Google.
 
 TODO:
+## C#
+* [x] Add Asynconous recognition.
+* [ ] Add recognition outside of forms.
 
+## Python
 * [x] Add Asynchronous reognition for larger files.
 * [x] Add support for streaming recognition.
   - * [ ] Make recognition async.
