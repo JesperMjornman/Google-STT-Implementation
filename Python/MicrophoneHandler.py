@@ -33,6 +33,7 @@ class MicrophoneHandler:
         self.audio_folder    = audio_folder
         self.paudio          = pyaudio.PyAudio()
         
+        self._stream = None
         self.__active_thread = None
        
     def start_recording(self, filename = None, streaming = False):
@@ -69,10 +70,15 @@ class MicrophoneHandler:
         """
         print('Stopping recording.')
         self.recording = False        
-       
+        
         if self.__active_thread != None:
             self.__active_thread.join()
         
+        if self.streaming:
+            self._stream.stop_stream()
+            self.streaming = False
+
+        self._stream.close()     
         self.__active_thread = None   
 
         return self.current_session
@@ -90,7 +96,7 @@ class MicrophoneHandler:
         """
         print('Recording: {}'.format(filename))
         try:
-            stream = self.paudio.open(
+            self._stream = self.paudio.open(
                 format             = self.FORMAT,
                 channels           = self.CHANNELS,
                 rate               = self.RATE,
@@ -107,13 +113,13 @@ class MicrophoneHandler:
         frames = []
         try:
             while(self.recording is True):
-                data = stream.read(self.CHUNK)
+                data = self._stream.read(self.CHUNK)
                 frames.append(data)
         except:
             print('Error when recording audio.')
 
-        stream.stop_stream()
-        stream.close()
+        self._stream.stop_stream()
+        self._stream.close()
         self.paudio.terminate()
 
         try:          
@@ -132,7 +138,7 @@ class MicrophoneHandler:
         self.recording = True
         print('Streaming: {}'.format(filename))
         try:
-            stream = self.paudio.open(
+            self._stream = self.paudio.open(
                 format             = self.FORMAT,
                 channels           = self.CHANNELS,
                 rate               = self.RATE,
@@ -145,12 +151,32 @@ class MicrophoneHandler:
             print('Failed to open audio stream.')
             return
 
-        stream.start_stream()
+        self.streaming = True
+        self._stream.start_stream()
         time.sleep(5)
         
-        stream.stop_stream()
-        stream.close()
+        self._stream.stop_stream()
+        self._stream.close()
         self.paudio.terminate()
 
         self.streaming = False
         self.recording = False
+    
+    def stream_generator(self):
+        while self.streaming:
+            chunk = self.chunk_buf.get()
+            if chunk is None:
+                return
+            data = [chunk]
+
+            while True:
+                try:
+                    chunk = self.chunk_buf.get(block=False)
+                    if chunk is None:
+                        return
+                    data.append(chunk)
+
+                except queue.Empty:
+                    break
+            
+            yield b''.join(data)

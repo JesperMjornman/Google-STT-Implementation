@@ -48,6 +48,32 @@ class SpeechRecognition:
             'de-DE', 'sv-SE', 'no-NO'          
         ]
 
+    
+    def load_language_codes(self, path):
+        """
+        Load language codes from a text file with format in:
+            ca-ES
+            en-US
+            sv-SE
+             .
+             .
+             .
+
+        I.e. one code per line.
+
+        Args:
+            path -- path to language code file.
+        """    
+        try:
+            fp = open(path, 'r+')
+            languages = [line for line in fp.readlines()]
+            fp.close
+        except:
+            print('Failed to read languages file.')
+            return
+        
+        self.languages = languages
+
     def start_record_microphone(self):
         """
         Start recording from microphone.
@@ -92,7 +118,7 @@ class SpeechRecognition:
             audio = speech.RecognitionAudio(content=content)
 
         if language_code not in self.languages:
-            print('\"{}\" is not a supported language code. Make sure it\'s supported by Google and try adding adding it to the languages list.\n'.format(language_code))
+            print('\"{}\" is not a supported language code. Make sure it\'s supported by Google and try adding it to the languages list.\n'.format(language_code))
             return -1
 
         config = speech.RecognitionConfig(
@@ -111,9 +137,7 @@ class SpeechRecognition:
         elif return_options == "all":
             return str(response)
         else:
-            return self.__get_message_from_proto(response)['transcript']
-
-    
+            return self.__get_message_from_proto(response)['transcript']   
     
     # pylint: disable=too-many-function-args
     def recognize_async_audio_stream(self, language_code = "en-US"):
@@ -123,6 +147,10 @@ class SpeechRecognition:
         Args:
             language_code -- language to use for recognition. See languages for supported languages.   
         """      
+        if language_code not in self.languages:
+            print('\"{}\" is not a supported language code. Make sure it\'s supported by Google and try adding adding it to the languages list.\n'.format(language_code))
+            return
+
         config_stream = speech.StreamingRecognitionConfig(
             config = speech.RecognitionConfig(
                 encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -132,34 +160,18 @@ class SpeechRecognition:
             interim_results=True      
         )
         
-        data = []
         self.microphone_handler.start_recording(streaming=True)
-        while self.microphone_handler.recording:
-            chunk = self.microphone_handler.chunk_buf.get()
-
-            if chunk is None:
-                return
-
-            data.append(chunk)
-            while True:
-                try:                   
-                    chunk = self.microphone_handler.chunk_buf.get(block=False) 
-                    
-                    if chunk is None:
-                        return
-
-                    data.append(chunk)
-                    
-                except queue.Empty:
-                    break
-
-            requests = (speech.StreamingRecognizeRequest(audio_content=content) for content in b''.join(data)) # Hittar inget att iterera?
+        while self.microphone_handler.streaming:
+            data = self.microphone_handler.stream_generator()
+            requests = (speech.StreamingRecognizeRequest(audio_content=content) for content in data) # Hittar inget att iterera?
 
             try:
                 responses = self.client.streaming_recognize(config_stream, requests)
                 for response in responses:
                     if response.results[0].is_final:
                         print(response.results[0].alternatives[0].transcript)
+                    else:
+                        print(response.results[0].alternatives[0].transcript + '\n')
             except:
                 print('Failed to get response.')
           
@@ -206,5 +218,4 @@ class SpeechRecognition:
         self.stop_record_microphone()
         
         if not self.save_audio_file:
-            self.__clear_audio_files()
-
+            self.__clear_audio_files()       

@@ -9,3 +9,5 @@ Note that each implementation require an API - key from Google.
 TODO:
 
 * [x] Add Asynchronous reognition for larger files.
+* [x] Add support for streaming recognition.
+  - * [ ] Make recognition async.
