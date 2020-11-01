@@ -169,13 +169,13 @@ class SpeechRecognition:
                 responses = self.client.streaming_recognize(config_stream, requests)
                 for response in responses:
                     if response.results[0].is_final:
-                        print(response.results[0].alternatives[0].transcript)
+                        print('FINAL: [{}]\n'.format(response.results[0].alternatives[0].transcript))
                     else:
-                        print(response.results[0].alternatives[0].transcript + '\n')
+                        print(response.results[0].alternatives[0].transcript + '\n') # Print all non final results (debug).
             except:
                 print('Failed to get response.')
           
-            self.microphone_handler.recording = False #tt
+            self.microphone_handler.streaming = False #tt
 
     def __clear_audio_files(self):
         """

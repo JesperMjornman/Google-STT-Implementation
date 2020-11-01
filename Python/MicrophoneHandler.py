@@ -57,7 +57,7 @@ class MicrophoneHandler:
             self.stop_recording
        
         if streaming:
-            self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )
+            self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )          
         else:
             self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
        
@@ -76,11 +76,14 @@ class MicrophoneHandler:
         
         if self.streaming:
             self._stream.stop_stream()
-            self.streaming = False
+            self._stream.close()
+            self.paudio.terminate()
 
-        self._stream.close()     
+        self.streaming = False
+        self.recording = False
+
         self.__active_thread = None   
-
+        
         return self.current_session
 
     def _audio_callback_handler(self, in_data, *args, **kwargs):
@@ -153,14 +156,6 @@ class MicrophoneHandler:
 
         self.streaming = True
         self._stream.start_stream()
-        time.sleep(5)
-        
-        self._stream.stop_stream()
-        self._stream.close()
-        self.paudio.terminate()
-
-        self.streaming = False
-        self.recording = False
     
     def stream_generator(self):
         while self.streaming:
