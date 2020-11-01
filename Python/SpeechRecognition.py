@@ -159,7 +159,7 @@ class SpeechRecognition:
             ),
             interim_results=True      
         )
-        
+
         self.microphone_handler.start_recording(streaming=True)
         while self.microphone_handler.streaming:
             data = self.microphone_handler.stream_generator()

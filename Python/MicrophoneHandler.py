@@ -44,6 +44,7 @@ class MicrophoneHandler:
 
         Args:
             filename -- filename of current recording, if None it will default to a timestamp.
+            streaming -- if true will stream asynchronous audio for recognition. If false will create a audio file and send it for recognition.
         """
         if (self.paudio.get_device_count() < 1):
             print('Failed to identify any microphone!')
@@ -158,6 +159,9 @@ class MicrophoneHandler:
         self._stream.start_stream()
     
     def stream_generator(self):
+        """
+        Yield all currently recorded chunks of audio.
+        """
         while self.streaming:
             chunk = self.chunk_buf.get()
             if chunk is None:
