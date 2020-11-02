@@ -43,7 +43,7 @@ class MicrophoneHandler:
         Currently only supports one thread, any more may cause issues.
 
         Args:
-            filename -- filename of current recording, if None it will default to a timestamp.
+            filename  -- filename of current recording, if None it will default to a timestamp.
             streaming -- if true will stream asynchronous audio for recognition. If false will create a audio file and send it for recognition.
         """
         if (self.paudio.get_device_count() < 1):
@@ -58,11 +58,11 @@ class MicrophoneHandler:
             self.stop_recording
        
         if streaming:
-            self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )          
+            #self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )          
+            self.__active_streaming(filename)
         else:
-            self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )
-       
-        self.__active_thread.start()
+            self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )       
+            self.__active_thread.start()
         
     def stop_recording(self):
         """
@@ -166,7 +166,7 @@ class MicrophoneHandler:
 
         self.streaming = True
         self._stream.start_stream()
-    
+
     def stream_generator(self):
         """
         Yield all currently recorded chunks of audio.
