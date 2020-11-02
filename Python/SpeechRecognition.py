@@ -144,6 +144,7 @@ class SpeechRecognition:
     def recognize_async_audio_stream(self, language_code = "en-US"):
         """
         Recognize in "real-time" from microphone stream.
+        
         May be created as a thread of its own, otherwise the streaming must be 
         stopped with CTRL + C.
         
