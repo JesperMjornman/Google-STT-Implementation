@@ -40,7 +40,7 @@ class SpeechRecognition:
 
         self.microphone_handler = MicrophoneHandler.MicrophoneHandler(self.audio_file_folder)
 
-        # If any language isn't here add it to enable support for it (the recognizer will check if the language is present here)
+        # If any language isn't here add it to enable support for it or load from text file (the recognizer will check if the language is present here)
         # See all supported languages on: https://cloud.google.com/speech-to-text/docs/languages
         self.languages = [
             'ca-ES', 'my-MM', 'hr-HR',
@@ -52,15 +52,7 @@ class SpeechRecognition:
     
     def load_language_codes(self, path):
         """
-        Load language codes from a text file with format in:
-            ca-ES
-            en-US
-            sv-SE
-             .
-             .
-             .
-
-        I.e. one code per line.
+        Load language codes from a text file (formatted one code per line).
 
         Args:
             path -- path to language code file.
