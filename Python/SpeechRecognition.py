@@ -27,10 +27,11 @@ class SpeechRecognition:
         # Set environment variable.
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_KEY_LOCATION
         
-        self.current_session = []
-        self.save_audio_file = save_audio_files
-        self.client = speech.SpeechClient()
-        self.record_length = 0
+        self.current_session    = []
+        self.record_length      = 0
+        self.save_audio_file    = save_audio_files
+        self.client             = speech.SpeechClient()
+        self.final_result_queue = queue.Queue() # Used to store all streamed transcriptions for most recent session.
 
         if (preffered_audio_folder == None):
             self.audio_file_folder = './audio'
@@ -146,12 +147,17 @@ class SpeechRecognition:
         May be created as a thread of its own, otherwise the streaming must be 
         stopped with CTRL + C.
         
+        Stores all decoded final text into `final_result_queue`, use this to get
+        all final results. 
+
         Args:
             language_code -- language to use for recognition. See languages for supported languages.   
         """      
         if language_code not in self.languages:
             print('\"{}\" is not a supported language code. Make sure it\'s supported by Google and try adding adding it to the languages list.\n'.format(language_code))
             return
+
+        self.final_result_queue.queue.clear() # Clear all items in queue for new stream.
 
         config_stream = speech.StreamingRecognitionConfig(
             config = speech.RecognitionConfig(
@@ -165,13 +171,13 @@ class SpeechRecognition:
         self.microphone_handler.start_recording(streaming=True)
         while self.microphone_handler.streaming:
             data = self.microphone_handler.stream_generator()
-            requests = (speech.StreamingRecognizeRequest(audio_content=content) for content in data) # Hittar inget att iterera?
+            requests = (speech.StreamingRecognizeRequest(audio_content=content) for content in data)
 
             try:
                 responses = self.client.streaming_recognize(config_stream, requests)
                 for response in responses:
                     if response.results[0].is_final:
-                        print('FINAL: [{}]\n'.format(response.results[0].alternatives[0].transcript))
+                        self.final_result_queue.put(response.results[0].alternatives[0].transcript)
                     else:
                         print(response.results[0].alternatives[0].transcript + '\n') # Print all non final results (debug).
             except:
