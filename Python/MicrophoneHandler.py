@@ -114,7 +114,7 @@ class MicrophoneHandler:
                 stream_callback    = self._audio_callback_handler,
             )
         except: 
-            sys.sterr.write("Failed to open audio stream.")
+            sys.stderr.write("Failed to open audio stream.")
             return
 
         self.recording = True       
