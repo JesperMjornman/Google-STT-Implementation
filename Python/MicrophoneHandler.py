@@ -3,6 +3,7 @@ import wave
 import datetime
 import time
 import os
+import sys
 import queue
 from threading import Thread
 
@@ -108,12 +109,12 @@ class MicrophoneHandler:
                 channels           = self.CHANNELS,
                 rate               = self.RATE,
                 input              = True,
-                input_device_index = 0,
+                input_device_index = self._get_default_microphone(),
                 frames_per_buffer  = self.CHUNK,
                 stream_callback    = self._audio_callback_handler,
             )
         except: 
-            print('Failed to open audio stream.')
+            sys.sterr.write("Failed to open audio stream.")
             return
 
         self.recording = True       
@@ -123,7 +124,7 @@ class MicrophoneHandler:
                 data = self._stream.read(self.CHUNK)
                 frames.append(data)
         except:
-            print('Error when recording audio.')
+            sys.stderr.write("Error when recording audio.")
 
         self._stream.stop_stream()
         self._stream.close()
@@ -156,7 +157,7 @@ class MicrophoneHandler:
                 channels           = self.CHANNELS,
                 rate               = self.RATE,
                 input              = True,
-                input_device_index = 0,
+                input_device_index = self._get_default_microphone(),
                 frames_per_buffer  = self.CHUNK,
                 stream_callback    = self._audio_callback_handler,
             )
@@ -188,3 +189,10 @@ class MicrophoneHandler:
                     break
             
             yield b''.join(data)
+
+    def _get_default_microphone(self) -> int:
+        try:        
+            p = pyaudio.PyAudio()
+            return p.get_default_input_device_info()['index']
+        except:
+            return 0

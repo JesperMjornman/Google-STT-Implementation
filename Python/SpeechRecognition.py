@@ -140,8 +140,7 @@ class SpeechRecognition:
         May be created as a thread of its own, otherwise the streaming must be 
         stopped with CTRL + C.
         
-        Stores all decoded final text into `final_result_queue`, use this to get
-        all final results. 
+        Stores all decoded final text into `final_result_queue`.
 
         Args:
             language_code -- language to use for recognition. See languages for supported languages.   
@@ -175,8 +174,6 @@ class SpeechRecognition:
                         print(response.results[0].alternatives[0].transcript + '\n') # Print all non final results (debug).
             except:
                 print('Failed to get response.')
-          
-            self.microphone_handler.streaming = False #tt
 
     def __clear_audio_files(self):
         """
