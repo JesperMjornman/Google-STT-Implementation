@@ -5,6 +5,7 @@ import time
 import os
 import sys
 import queue
+
 from threading import Thread
 
 class MicrophoneHandler:
@@ -42,7 +43,10 @@ class MicrophoneHandler:
         Starts recording the default microphone.
         Creates a new thread for recording audio.
         Currently only supports one thread, any more may cause issues.
-
+        
+        Note that streaming audio does not create a new Thread but expects the caller
+        to create a new Thread for the function (see main.py).
+        
         Args:
             filename  -- filename of current recording, if None it will default to a timestamp.
             streaming -- if true will stream asynchronous audio for recognition. If false will create a audio file and send it for recognition.
@@ -110,11 +114,10 @@ class MicrophoneHandler:
                 rate               = self.RATE,
                 input              = True,
                 input_device_index = self._get_default_microphone(),
-                frames_per_buffer  = self.CHUNK,
-                stream_callback    = self._audio_callback_handler,
+                frames_per_buffer  = self.CHUNK
             )
         except: 
-            sys.stderr.write("Failed to open audio stream.")
+            print("Failed to open audio stream.")
             return
 
         self.recording = True       
@@ -124,7 +127,7 @@ class MicrophoneHandler:
                 data = self._stream.read(self.CHUNK)
                 frames.append(data)
         except:
-            sys.stderr.write("Error when recording audio.")
+            print("Error when recording audio.")
 
         self._stream.stop_stream()
         self._stream.close()
@@ -136,11 +139,10 @@ class MicrophoneHandler:
             file.setsampwidth(self.paudio.get_sample_size(self.FORMAT))
             file.setframerate(self.RATE)
             file.writeframesraw(b''.join(frames))
-            file.close()
         except:
             print('Failure to write file {}{}'.format(filename, self.EXTENSION))
-            if not file.closed:
-                file.close()
+        finally:
+            file.close()
 
     def __active_streaming(self, filename = None):
         """
