@@ -36,7 +36,7 @@ class MicrophoneHandler:
         self.paudio          = pyaudio.PyAudio()
         
         self._stream = None
-        self.__active_thread = None
+        self._active_thread = None
        
     def start_recording(self, filename = None, streaming = False):
         """
@@ -56,14 +56,14 @@ class MicrophoneHandler:
             filename = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
         self.current_session = filename
-        if self.__active_thread is not None:
+        if self._active_thread is not None:
             self.stop_recording
        
         if streaming:      
-            self.__active_streaming(filename)
+            self._active_streaming(filename)
         else:
-            self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )       
-            self.__active_thread.start()
+            self._active_thread = Thread(target=self._active_recording, args=( filename, ) )       
+            self._active_thread.start()
         
     def stop_recording(self):
         """
@@ -73,8 +73,8 @@ class MicrophoneHandler:
         print('Stopping recording.')
         self.recording = False        
         
-        if self.__active_thread != None:
-            self.__active_thread.join()
+        if self._active_thread != None:
+            self._active_thread.join()
         
         if self.streaming:
             self._stream.stop_stream()
@@ -84,7 +84,7 @@ class MicrophoneHandler:
         self.streaming = False
         self.recording = False
 
-        self.__active_thread = None   
+        self._active_thread = None   
         
         return self.current_session
 
@@ -95,7 +95,7 @@ class MicrophoneHandler:
         self.chunk_buf.put(in_data)
         return None, pyaudio.paContinue
 
-    def __active_recording(self, filename):
+    def _active_recording(self, filename):
         """
         Record function for the active recorder thread.
 
@@ -140,7 +140,7 @@ class MicrophoneHandler:
         finally:
             file.close()
 
-    def __active_streaming(self, filename = None):
+    def _active_streaming(self, filename = None):
         """
         Streaming function for the active recorded thread.
 
