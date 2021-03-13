@@ -41,12 +41,9 @@ class MicrophoneHandler:
     def start_recording(self, filename = None, streaming = False):
         """
         Starts recording the default microphone.
-        Creates a new thread for recording audio.
+        Creates a new thread for recording audio in sync mode, not for async mode.
         Currently only supports one thread, any more may cause issues.
-        
-        Note that streaming audio does not create a new Thread but expects the caller
-        to create a new Thread for the function (see main.py).
-        
+
         Args:
             filename  -- filename of current recording, if None it will default to a timestamp.
             streaming -- if true will stream asynchronous audio for recognition. If false will create a audio file and send it for recognition.
@@ -62,8 +59,7 @@ class MicrophoneHandler:
         if self.__active_thread is not None:
             self.stop_recording
        
-        if streaming:
-            #self.__active_thread = Thread(target=self.__active_streaming, args=( filename, ) )          
+        if streaming:      
             self.__active_streaming(filename)
         else:
             self.__active_thread = Thread(target=self.__active_recording, args=( filename, ) )       
@@ -169,7 +165,7 @@ class MicrophoneHandler:
 
         self.streaming = True
         self._stream.start_stream()
-
+        
     def stream_generator(self):
         """
         Yield all currently recorded chunks of audio.
