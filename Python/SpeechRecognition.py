@@ -120,7 +120,7 @@ class SpeechRecognition:
         except:
             return -1
 
-        return self.__get_message_from_proto(response)['transcript']
+        return self._get_message_from_proto(response)['transcript']
     
     # pylint: disable=too-many-function-args
     def recognize_async_audio_stream(self, language_code = "en-US"):
@@ -177,7 +177,7 @@ class SpeechRecognition:
         """
         return self.current_session.get(wait)
 
-    def __clear_audio_files(self):
+    def _clear_audio_files(self):
         """
         Clear all audio files from set audio folder.
         """
@@ -186,7 +186,7 @@ class SpeechRecognition:
         except:
             print('Failure to clear audio files in {self.audio_file_folder}')
 
-    def __get_message_from_proto(self, message) -> dict: 
+    def _get_message_from_proto(self, message) -> dict: 
         """
         Decode and get the most confident message from the protobuf.
 
