@@ -11,7 +11,7 @@ Note that each implementation require an API - key from Google. This is expected
 * [ ] Add recognition outside of forms.
 
 ## Python
-* [x] Add Asynchronous reognition for larger files.
+* [x] Add Asynchronous recognition for larger files.
 * [x] Add support for streaming recognition.
   - * [x] Make recognition async.
 
