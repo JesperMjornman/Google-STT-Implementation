@@ -17,4 +17,4 @@ Note that each implementation require an API - key from Google. This is expected
 
 ## Warnings
 Should be noted that the latest version is NOT tested as it is from another project. 
-```main.py``` is also outdated and might not reflect an actual implementation example.
+```main.py``` presents a somewhat outdated implementation example. 
